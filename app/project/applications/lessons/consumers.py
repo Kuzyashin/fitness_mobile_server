@@ -10,7 +10,7 @@ from rest_framework.serializers import Serializer
 
 from .models import Lesson
 from .serializers import LessonSerializer
-from utils.amqp_handlers import PikaProducerHandler
+from project.utils.amqp_handlers import PikaProducerHandler
 
 
 RABBIT_HOST = os.environ['RABBIT_HOST']
