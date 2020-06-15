@@ -68,13 +68,16 @@ class LessonConsumer(BaseConsumer):
 
     async def websocket_connect(self, message):
         await self.connect()
+        await self.send("Send request to DB for outdated (maybe) data")
         data, _ = await self.list()
         await self.send_json(data)
         signal_data = {
             'action': 'update',
             'channel_name': self.channel_name
         }
+        await self.send("Send request via rabbitmq to integration server to update data in DB")
         await sync_to_async(self.producer.publish_message)(signal_data)
+        await self.send("Now we are waiting for integration server for update data in DB")
 
     async def receive_json(self, content, **kwargs):
         data, resp = await self.list()
@@ -85,6 +88,9 @@ class LessonConsumer(BaseConsumer):
         Called when someone has messaged our chat.
         """
         # Send a message down to the client
-        await self.send("UPDATED DATA")
+        await self.send("Integration server updated data")
+        await self.send("Send request to DB for fresh data")
         data, _ = await self.list()
         await self.send_json(data)
+        await self.send("Closing connection")
+        await self.close()
