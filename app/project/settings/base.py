@@ -46,6 +46,9 @@ CHANNEL_LAYERS = {
     },
 }
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': 'https://backend.mobile.fitnesskit.awkr.site/'
 }
