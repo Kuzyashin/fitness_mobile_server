@@ -24,9 +24,10 @@ from lessons.views import LessonViewSet
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Lessons ",
-      default_version='v1',
-      contact=openapi.Contact(email="alex@rocketcompute.com"),
+       title="Lessons ",
+       url='https://backend.mobile.fitnesskit.awkr.site/',
+       default_version='v1',
+       contact=openapi.Contact(email="alex@rocketcompute.com"),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
