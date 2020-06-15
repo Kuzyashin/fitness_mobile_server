@@ -45,3 +45,11 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+SWAGGER_SETTINGS = {
+    'DEFAULT_API_URL': 'https://backend.mobile.fitnesskit.awkr.site/'
+}
+
+REDOC_SETTINGS = {
+   'DEFAULT_API_URL': 'https://backend.mobile.fitnesskit.awkr.site/'
+}
