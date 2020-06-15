@@ -70,7 +70,7 @@ class LessonConsumer(BaseConsumer):
         await self.connect()
         await self.send("Send request to DB for outdated (maybe) data")
         data, _ = await self.list()
-        await self.send(data)
+        await self.send_json({"data": data})
         signal_data = {
             'action': 'update',
             'channel_name': self.channel_name
@@ -81,7 +81,7 @@ class LessonConsumer(BaseConsumer):
 
     async def receive_json(self, content, **kwargs):
         data, resp = await self.list()
-        await self.send(data)
+        await self.send_json({"data": data})
 
     async def refresh_complete(self, event):
         """
@@ -91,6 +91,6 @@ class LessonConsumer(BaseConsumer):
         await self.send("Integration server updated data")
         await self.send("Send request to DB for fresh data")
         data, _ = await self.list()
-        await self.send(data)
+        await self.send_json({"data": data})
         await self.send("Closing connection")
         await self.close()
