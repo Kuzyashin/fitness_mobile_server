@@ -15,10 +15,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from rest_framework import routers
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import routers, permissions
 
 from lessons.views import LessonViewSet
 
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Lessons ",
+      default_version='v1',
+      contact=openapi.Contact(email="alex@rocketcompute.com"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
 
 router = routers.DefaultRouter()
 router.register(r'lessons', LessonViewSet, basename='lessons')
@@ -26,6 +38,8 @@ router.register(r'lessons', LessonViewSet, basename='lessons')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
 urlpatterns += router.urls

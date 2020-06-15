@@ -4,6 +4,7 @@ INSTALLED_APPS = [
     'core',
     'lessons',
 
+    'drf_yasg',
     'channels',
     'rest_framework',
     'rest_framework.authtoken',
