@@ -12,7 +12,7 @@ services:
       - 8002:8002
     volumes:
       - ./app/public:/app/public
-    networks:
+    networks:hi
       - default
       - shared_net
 
