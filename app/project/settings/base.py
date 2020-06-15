@@ -30,8 +30,8 @@ sys.path.append(os.path.join(PROJECT_ROOT, 'applications'))
 
 ROOT_URLCONF = 'project.urls'
 
-WSGI_APPLICATION = 'project.wsgi.application'
-ASGI_APPLICATION = "project.asgi.application"
+WSGI_APPLICATION = 'wsgi.application'
+ASGI_APPLICATION = "routing.application"
 
 REDIS_HOST = os.environ['REDIS_HOST']
 
