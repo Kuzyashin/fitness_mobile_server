@@ -3,4 +3,4 @@ COPY ./app ./app
 RUN pip install --no-cache-dir -r ./app/requirements.txt
 ENV PYTHONUNBUFFERED 1
 WORKDIR ./app
-CMD ["uvicorn", "project.routing:application", "--host", "0.0.0.0", "--port", "8002"]
+CMD ["uvicorn", "project.asgi:application", "--host", "0.0.0.0", "--port", "8002"]
