@@ -17,6 +17,7 @@ RABBIT_HOST = os.environ['RABBIT_HOST']
 RABBIT_LOGIN = os.environ['RABBIT_LOGIN']
 RABBIT_PASSWORD = os.environ['RABBIT_PASSWORD']
 
+
 class BaseConsumer(AsyncJsonWebsocketConsumer):
     os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
     queryset = None
