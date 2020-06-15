@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-from project.applications.lessons.models import Lesson
-from project.applications.lessons.utils.parser import get_data
+from lessons.models import Lesson
+from lessons.utils.parser import get_data
 
 
 class Command(BaseCommand):
