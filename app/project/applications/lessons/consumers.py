@@ -8,6 +8,7 @@ from django.db.models import QuerySet
 from rest_framework import status
 from rest_framework.serializers import Serializer
 
+from core.pagination import LimitOffsetPagination
 from .models import Lesson
 from .serializers import LessonSerializer
 from project.utils.amqp_handlers import PikaProducerHandler
@@ -22,6 +23,7 @@ class BaseConsumer(AsyncJsonWebsocketConsumer):
     os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
     queryset = None
     serializer_class = None
+    pagination_class = None
 
     def get_queryset(self, **kwargs) -> QuerySet:
         assert self.queryset is not None, (
@@ -55,6 +57,33 @@ class BaseConsumer(AsyncJsonWebsocketConsumer):
         )
         return serializer.data, status.HTTP_200_OK
 
+    @property
+    def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        """
+        Return a single page of results, or `None` if pagination is disabled.
+        """
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(queryset, self.scope, view=self)
+
+    def get_paginated_response(self, data):
+        """
+        Return a paginated style `Response` object for the given output data.
+        """
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data)
+
 
 class LessonConsumer(BaseConsumer):
 
@@ -65,12 +94,16 @@ class LessonConsumer(BaseConsumer):
 
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    pagination_class = LimitOffsetPagination
 
     async def websocket_connect(self, message):
         await self.connect()
         await self.send("Send request to DB for outdated (maybe) data")
-        data, _ = await self.list()
-        await self.send_json({"data": data})
+        resp_data, _ = await self.list()
+        if self.paginator:
+            paginated = await self.paginate_queryset(resp_data)
+            resp_data = await self.get_paginated_response(paginated)
+        await self.send_json(resp_data)
         signal_data = {
             'action': 'update',
             'channel_name': self.channel_name
@@ -90,7 +123,10 @@ class LessonConsumer(BaseConsumer):
         # Send a message down to the client
         await self.send("Integration server updated data")
         await self.send("Send request to DB for fresh data")
-        data, _ = await self.list()
-        await self.send_json({"data": data})
+        resp_data, _ = await self.list()
+        if self.paginator:
+            paginated = await self.paginate_queryset(resp_data)
+            resp_data = await self.get_paginated_response(paginated)
+        await self.send_json(resp_data)
         await self.send("Closing connection")
         await self.close()
