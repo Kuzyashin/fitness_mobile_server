@@ -117,10 +117,6 @@ class LessonConsumer(BaseConsumer):
         await self.send_json({"data": data})
 
     async def refresh_complete(self, event):
-        """
-        Called when someone has messaged our chat.
-        """
-        # Send a message down to the client
         await self.send("Integration server updated data")
         await self.send("Send request to DB for fresh data")
         resp_data, _ = await self.list()
