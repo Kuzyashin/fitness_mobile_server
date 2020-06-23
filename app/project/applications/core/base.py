@@ -89,6 +89,7 @@ class DjangoViewAsConsumer(BaseConsumer):
     producer = None
 
     def get_querydict(self, request):
+        print(self.scope)
         query_string = self.scope.get('query_string', None).decode()
         query_dict = dict(parse.parse_qsl(query_string))
         return query_dict
@@ -152,7 +153,7 @@ class DjangoViewAsConsumer(BaseConsumer):
     async def refresh_complete(self, event):
         await self.send("Integration server updated data")
         await self.send("Send request to DB for fresh data")
-        resp_data, _ = await self.list()
+        resp_data, _ = await self.call_view('list')
         await self.send_json(resp_data)
         await self.send("Closing connection")
         await self.close()

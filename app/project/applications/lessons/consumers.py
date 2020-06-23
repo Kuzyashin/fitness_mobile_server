@@ -1,11 +1,7 @@
 import os
 
-from asgiref.sync import sync_to_async
 
-from core.base import BaseConsumer, DjangoViewAsConsumer
-from core.pagination import LimitOffsetPagination
-from .models import Lesson
-from .serializers import LessonSerializer
+from core.base import DjangoViewAsConsumer
 from project.utils.amqp_handlers import PikaProducerHandler
 
 
