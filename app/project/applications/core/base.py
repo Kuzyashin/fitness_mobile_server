@@ -94,6 +94,15 @@ class DjangoViewAsConsumer(BaseConsumer):
         query_dict = dict(parse.parse_qsl(query_string))
         return query_dict
 
+    def get_server_name_port(self):
+        server_host = self.scope.get('server')[0]
+        server_port = self.scope.get('server')[1]
+        server_name = self.scope.get('headers').get('host')
+        if server_name:
+            return server_name, server_port
+        else:
+            return server_host, server_port
+
     @database_sync_to_async
     def call_view(self, action: str, **kwargs):
         request = WSRequest()
@@ -101,8 +110,7 @@ class DjangoViewAsConsumer(BaseConsumer):
         request.session = self.scope.get("session", None)
         request.query_params = self.get_querydict(request)
 
-        request.META['SERVER_NAME'] = self.scope.get('server')[0]
-        request.META['SERVER_PORT'] = self.scope.get('server')[1]
+        request.META['SERVER_NAME'], request.META['SERVER_PORT'] = self.get_server_name_port()
         request.META["HTTP_CONTENT_TYPE"] = "application/json"
         request.META["HTTP_ACCEPT"] = "application/json"
         request.META["QUERY_STRING"] = self.scope.get('query_string', None).decode()
