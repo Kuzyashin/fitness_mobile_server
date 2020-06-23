@@ -97,7 +97,7 @@ class DjangoViewAsConsumer(BaseConsumer):
     def get_server_name_port(self):
         server_host = self.scope.get('server')[0]
         server_port = self.scope.get('server')[1]
-        server_name = dict(self.scope.get('headers')[0]).get('host')
+        server_name = dict(self.scope.get('headers')).get('host')
         if server_name:
             return server_name, server_port
         else:
@@ -110,7 +110,7 @@ class DjangoViewAsConsumer(BaseConsumer):
         request.session = self.scope.get("session", None)
         request.query_params = self.get_querydict(request)
 
-        request.META['HTTP_X_FORWARDED_HOST'] = dict(self.scope.get('headers')[0]).get('host')
+        request.META['HTTP_X_FORWARDED_HOST'] = dict(self.scope.get('headers')).get('host')
         request.META['SERVER_NAME'], request.META['SERVER_PORT'] = self.get_server_name_port()
         request.META["HTTP_CONTENT_TYPE"] = "application/json"
         request.META["HTTP_ACCEPT"] = "application/json"
