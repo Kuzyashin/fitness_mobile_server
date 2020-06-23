@@ -97,6 +97,8 @@ class DjangoViewAsConsumer(BaseConsumer):
     def get_server_name_port(self):
         server_host = self.scope.get('server')[0]
         server_port = self.scope.get('server')[1]
+        print(dict(self.scope.get('headers')))
+        print(dict(self.scope.get('headers').decode()))
         server_name = dict(self.scope.get('headers')).get('host')
         if server_name:
             return server_name, server_port
