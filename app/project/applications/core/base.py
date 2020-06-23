@@ -110,6 +110,7 @@ class DjangoViewAsConsumer(BaseConsumer):
         request.session = self.scope.get("session", None)
         request.query_params = self.get_querydict(request)
 
+        request.META['HTTP_X_FORWARDED_HOST'] = self.scope.get('headers').get('host')
         request.META['SERVER_NAME'], request.META['SERVER_PORT'] = self.get_server_name_port()
         request.META["HTTP_CONTENT_TYPE"] = "application/json"
         request.META["HTTP_ACCEPT"] = "application/json"
