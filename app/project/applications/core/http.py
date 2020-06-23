@@ -15,6 +15,8 @@ class WSRequest(HttpRequest):
 
     @property
     def scheme(self):
+        print(self.META)
+        print(self.__dict__)
         if settings.SECURE_PROXY_SSL_HEADER:
             try:
                 header, secure_value = settings.SECURE_PROXY_SSL_HEADER
