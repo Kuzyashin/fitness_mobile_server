@@ -88,16 +88,22 @@ class DjangoViewAsConsumer(BaseConsumer):
     view = None
     producer = None
 
+    def decode_headers(self, headers):
+        data = {}
+        for item, value in dict(headers).items():
+            data[item.decode()] = value.decode()
+        return data
+
     def get_querydict(self, request):
-        print(self.scope)
         query_string = self.scope.get('query_string', None).decode()
         query_dict = dict(parse.parse_qsl(query_string))
         return query_dict
 
     def get_server_name_port(self):
+        headers = self.decode_headers(self.scope.get('headers'))
         server_host = self.scope.get('server')[0]
         server_port = self.scope.get('server')[1]
-        server_name = dict(self.scope.get('headers')).get(b'host')
+        server_name = headers.get('host')
         if server_name:
             return server_name, server_port
         else:
@@ -105,20 +111,21 @@ class DjangoViewAsConsumer(BaseConsumer):
 
     @database_sync_to_async
     def call_view(self, action: str, **kwargs):
+        headers = self.decode_headers(self.scope.get('headers'))
         request = WSRequest()
         request.path = self.scope.get("path")
         request.session = self.scope.get("session", None)
         request.query_params = self.get_querydict(request)
 
-        request.META['HTTP_X_FORWARDED_HOST'] = dict(self.scope.get('headers')).get(b'host')
+        request.META['HTTP_X_FORWARDED_HOST'] = headers.get('host')
         request.META['SERVER_NAME'], request.META['SERVER_PORT'] = self.get_server_name_port()
         request.META["HTTP_CONTENT_TYPE"] = "application/json"
         request.META["HTTP_ACCEPT"] = "application/json"
         request.META["QUERY_STRING"] = self.scope.get('query_string', None).decode()
         request.GET = QueryDict(self.scope.get('query_string', None).decode())
 
-        for (header_name, value) in self.scope.get("headers", []):
-            request.META[header_name.decode("utf-8")] = value.decode("utf-8")
+        for (header_name, value) in headers:
+            request.META[header_name] = value
 
         request.method = 'get'
         request.POST = json.dumps(kwargs.get("data", {}))
