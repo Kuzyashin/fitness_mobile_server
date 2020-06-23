@@ -1,3 +1,4 @@
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 
@@ -10,3 +11,5 @@ class LessonViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
 
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
+    pagination_class = LimitOffsetPagination
+

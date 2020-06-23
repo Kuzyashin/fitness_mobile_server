@@ -40,20 +40,22 @@ class LimitOffsetPagination(BasePagination):
     offset_query_description = 'The initial index from which to return the results.'
     max_limit = None
 
-    async def paginate_queryset(self, queryset, request, view=None):
-        self.count = await self.get_count(queryset)
-        self.limit = await self.get_limit(request)
+    def paginate_queryset(self, queryset, request, view=None):
+        print(type(request))
+        self.count = self.get_count(queryset)
+        self.limit = self.get_limit(request)
+        print(self.limit)
         if self.limit is None:
             return None
 
-        self.offset = await self.get_offset(request)
+        self.offset = self.get_offset(request)
         self.request = request
 
         if self.count == 0 or self.offset > self.count:
             return []
         return list(queryset[self.offset:self.offset + self.limit])
 
-    async def get_paginated_response(self, data):
+    def get_paginated_response(self, data):
         return OrderedDict([
             ('count', self.count),
             ('next',  self.get_next_link()),
@@ -61,9 +63,9 @@ class LimitOffsetPagination(BasePagination):
             ('results', data)
         ])
 
-    async def get_limit(self, request):
+    def get_limit(self, request):
         if self.limit_query_param:
-            qs = parse.parse_qs(request['query_string'].decode())
+            qs = parse.parse_qs(request['query_params'])
             try:
                 return _positive_int(
                     qs[self.limit_query_param][0],
@@ -75,7 +77,7 @@ class LimitOffsetPagination(BasePagination):
 
         return self.default_limit
 
-    async def get_offset(self, request):
+    def get_offset(self, request):
         try:
             qs = parse.parse_qs(request['query_string'].decode())
             return _positive_int(
@@ -112,7 +114,7 @@ class LimitOffsetPagination(BasePagination):
         offset = self.offset - self.limit
         return replace_query_param(url, self.offset_query_param, offset)
 
-    async def get_count(self, queryset):
+    def get_count(self, queryset):
         """
         Determine an object count, supporting either querysets or regular lists.
         """
