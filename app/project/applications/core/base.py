@@ -124,7 +124,7 @@ class DjangoViewAsConsumer(BaseConsumer):
         request.META["QUERY_STRING"] = self.scope.get('query_string', None).decode()
         request.GET = QueryDict(self.scope.get('query_string', None).decode())
 
-        for (header_name, value) in headers:
+        for (header_name, value) in headers.items():
             request.META[header_name] = value
 
         request.method = 'get'
